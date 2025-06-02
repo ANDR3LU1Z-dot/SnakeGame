@@ -1,23 +1,33 @@
 package com.example.snakegame
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 class InitialScreen {
 
     @Composable
-    fun StartScreen(navController: NavController) {
+    fun StartScreen(navController: NavController, mediaPlayer: MediaPlayerHelper = rememberMediaPlayer()) {
+
+        DisposableEffect(Unit) {
+            mediaPlayer.play(R.raw.main_menu)
+
+            onDispose {
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -25,14 +35,14 @@ class InitialScreen {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                "Snake Game",
-                modifier = Modifier.padding(bottom = 16.dp),
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White
+            Image(
+                painter = painterResource(id = R.drawable.snake_game_logo),
+                contentDescription = null,
+                modifier = Modifier.size(400.dp)
             )
 
-            Button(onClick = { navController.navigate(Routes.SNAKE_GAME_SCREEN) }) {
+            Button(modifier = Modifier.padding(top = 60.dp),
+                onClick = { navController.navigate(Routes.SNAKE_GAME_SCREEN) }) {
                 Text("Start Game")
             }
         }

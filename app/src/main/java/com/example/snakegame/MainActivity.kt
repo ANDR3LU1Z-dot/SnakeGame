@@ -27,12 +27,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -82,14 +84,15 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ManagerScreens(navController: NavHostController, game: Game) {
+        val mediaPlayer = rememberMediaPlayer()
 
         NavHost(navController = navController, startDestination = Routes.INITIAL_SCREEN) {
             composable(Routes.INITIAL_SCREEN) {
-                initialScreen.StartScreen(navController)
+                initialScreen.StartScreen(navController, mediaPlayer)
             }
 
             composable(Routes.SNAKE_GAME_SCREEN) {
-                Snake(game)
+                Snake(game, mediaPlayer)
             }
 
             composable(Routes.GAME_OVER_SCREEN) {
@@ -100,13 +103,24 @@ class MainActivity : ComponentActivity() {
                         navController.navigate(Routes.SNAKE_GAME_SCREEN) {
                             popUpTo(Routes.SNAKE_GAME_SCREEN) { inclusive = true }
                         }
-                    })
+                    }, onBackToMenu = {
+                        game.resetGame()
+                        navController.popBackStack(Routes.INITIAL_SCREEN, false)
+                    }, mediaPlayer)
             }
         }
     }
 
     @Composable
-    fun Snake(game: Game) {
+    fun Snake(game: Game, mediaPlayer: MediaPlayerHelper = rememberMediaPlayer()) {
+
+        DisposableEffect(Unit) {
+            mediaPlayer.play(R.raw.game_music)
+
+            onDispose {
+            }
+        }
+
         val state = game.state.collectAsState(initial = null)
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
